@@ -952,7 +952,10 @@ def Blueprints():
 
 @app.route("/persist/messages_received_ids")
 def PersistMessagesReceivedIDs():
-	return send_from_directory(directory="", path="data/persist/messages_received_ids.json", as_attachment=True, download_name="messages_received_ids.json")
+	message_ids_path = os.path.join(BASE_DIR, "data", "persist", "messages_received_ids.json")
+	if not os.path.exists(message_ids_path):
+		return jsonify([])
+	return send_from_directory(directory=BASE_DIR, path="data/persist/messages_received_ids.json", as_attachment=True, download_name="messages_received_ids.json")
 	
 @app.route("/persist/messages_get/<string:message>")
 def PersistMessagesGet(message):
