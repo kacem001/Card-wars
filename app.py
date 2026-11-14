@@ -1495,7 +1495,10 @@ def PersistFriendsInformation():
 	allyinfo = GetAllyInfo(player_id, False)
 	if allyinfo is None:
 		return make_response("No player found!", 404)
-	return jsonify(allyinfo)
+	return jsonify({
+		"success": True,
+		"data": allyinfo,
+	})
 
 @app.route("/persist/friends_all_requests_received/<string:player_id>", methods=['GET'])
 def PersistFriendsAllRequestsReceived(player_id):
