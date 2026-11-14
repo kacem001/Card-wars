@@ -1484,6 +1484,19 @@ def GetAllyInfo(player_id: str, isally: bool):
 	}
 	return data
 
+@app.route("/persist/friends_informationDW/", methods=['POST'])
+def PersistFriendsInformation():
+	clientData = parse_qs(request.get_data().decode('utf-8'))
+	clientData = {k: v[0] if len(v) == 1 else v for k, v in clientData.items()}
+	player_id = clientData.get("userid") or clientData.get("player_id")
+	if not player_id:
+		return make_response("Missing player id", 400)
+
+	allyinfo = GetAllyInfo(player_id, False)
+	if allyinfo is None:
+		return make_response("No player found!", 404)
+	return jsonify(allyinfo)
+
 @app.route("/persist/friends_all_requests_received/<string:player_id>", methods=['GET'])
 def PersistFriendsAllRequestsReceived(player_id):
 	db_user = Player.query.filter_by(username=player_id).first()
