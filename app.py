@@ -1524,6 +1524,7 @@ def PersistFriendsDenyRequest(player_id, invite_id):
 		return make_response("No player found!", 400)
 
 	UpdateLastOnline(player_id)	
+	invite_id = invite_id.replace("_", "-")
  
 	#remove friend request
 	player_requests = json.loads(db_user.friend_requests)
@@ -1539,6 +1540,7 @@ def PersistFriendsDenyRequest(player_id, invite_id):
 def PersistFriendsConfirmRequestWithMyInfo():
 	clientData = parse_qs(request.get_data().decode('utf-8'))
 	clientData = {k: v[0] if len(v) == 1 else v for k, v in clientData.items()}
+	invite_id = clientData["invite_id"].replace("_", "-")
  
 	UpdateLastOnline(clientData["player_id"])
  
@@ -1555,7 +1557,7 @@ def PersistFriendsConfirmRequestWithMyInfo():
 		})
   
 	#friend ally check
-	friendallycheck = AllyBoxSpaceNotExceeded(clientData["invite_id"])
+	friendallycheck = AllyBoxSpaceNotExceeded(invite_id)
 	if friendallycheck == False:
 		return jsonify({
 			"success": True,
@@ -1564,16 +1566,16 @@ def PersistFriendsConfirmRequestWithMyInfo():
 
 	#remove friend request
 	player_requests = json.loads(db_user.friend_requests)
-	player_requests.remove(clientData["invite_id"])
+	player_requests.remove(invite_id)
 	db_user.friend_requests = json.dumps(player_requests)
  
 	#add friend
 	player_friends = json.loads(db_user.friends)
-	player_friends.append(clientData["invite_id"])
+	player_friends.append(invite_id)
 	db_user.friends = json.dumps(player_friends)
  
 	#add self to friend's friend list
-	friend_user = Player.query.filter_by(username=clientData["invite_id"]).first()
+	friend_user = Player.query.filter_by(username=invite_id).first()
  
 	if friend_user is None:
 		return make_response("No player found!", 400)
@@ -1593,6 +1595,7 @@ def PersistFriendsRemove(player_id, invite_id):
 	db_user = Player.query.filter_by(username=player_id).first()
 	if db_user is None:
 		return make_response("No player found!", 400)
+	invite_id = invite_id.replace("_", "-")
 
 	#remove friend
 	player_friends = json.loads(db_user.friends)
