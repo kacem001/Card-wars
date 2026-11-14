@@ -1,0 +1,71 @@
+{% extends "admin_base.html" %}
+{% block content %}
+	<div class="dashboard-hero mb-4">
+		<div>
+			<div class="dashboard-kicker">CARD WARS KINGDOM ADMIN PANEL</div>
+			<h1>Good to see you, {{ current_user.username }}.</h1>
+			<p>Monitor your server and manage player operations from one place.</p>
+		</div>
+		<div class="server-status"><span class="status-dot"></span> Server online</div>
+	</div>
+	<div class="row g-3 mb-4">
+		<div class="col-sm-6 col-xl-3"><div class="stat-card d-flex justify-content-between"><div><div class="stat-label">Players</div><div class="stat-value">{{ player_count }}</div></div><div class="stat-icon"><i class="bi bi-people"></i></div></div></div>
+		<div class="col-sm-6 col-xl-3"><div class="stat-card d-flex justify-content-between"><div><div class="stat-label">Active today</div><div class="stat-value">{{ active_players }}</div></div><div class="stat-icon"><i class="bi bi-activity"></i></div></div></div>
+		<div class="col-sm-6 col-xl-3"><div class="stat-card d-flex justify-content-between"><div><div class="stat-label">Banned</div><div class="stat-value">{{ banned_count }}</div></div><div class="stat-icon"><i class="bi bi-shield-exclamation"></i></div></div></div>
+		<div class="col-sm-6 col-xl-3"><div class="stat-card d-flex justify-content-between"><div><div class="stat-label">Admins</div><div class="stat-value">{{ admin_count }}</div></div><div class="stat-icon"><i class="bi bi-person-lock"></i></div></div></div>
+	</div>
+	<div class="row g-4">
+		<div class="col-xl-8">
+			<div class="panel-card h-100">
+				<div class="section-heading"><div><span class="section-kicker">Operations</span><h5>Quick actions</h5></div></div>
+				<div class="quick-actions">
+					<a class="quick-action" href="/admin/players"><i class="bi bi-people"></i><span><strong>Manage players</strong><small>Search accounts and resources</small></span><i class="bi bi-arrow-up-right"></i></a>
+					<a class="quick-action" href="/admin/logs"><i class="bi bi-activity"></i><span><strong>Review activity</strong><small>Inspect administrator events</small></span><i class="bi bi-arrow-up-right"></i></a>
+					<a class="quick-action" href="/admin/server"><i class="bi bi-database-check"></i><span><strong>Server and backups</strong><small>Check maintenance tools</small></span><i class="bi bi-arrow-up-right"></i></a>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-4">
+			<div class="panel-card h-100">
+				<div class="section-heading"><div><span class="section-kicker">System</span><h5>Control center</h5></div></div>
+				<div class="system-check"><span class="status-dot"></span><div><strong>All systems operational</strong><small>Local server is accepting requests</small></div></div>
+				<div class="system-metric"><span>Player activity</span><strong>{{ active_players }} active today</strong></div>
+				<div class="system-metric"><span>Access protection</span><strong>{{ banned_count }} blocked accounts</strong></div>
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="panel-card">
+				<div class="section-heading"><div><span class="section-kicker">Audit trail</span><h5>Recent activity</h5></div><a href="/admin/logs" class="small">View all <i class="bi bi-arrow-right"></i></a></div>
+				<div class="table-responsive">
+				<table class="table table-striped table-sm">
+				<thead><tr><th scope="col">Time</th><th scope="col">Message</th></tr></thead>
+				<tbody>
+					{% for item in Activity %}
+					<tr><td>{{ item.time }}</td><td>{{ item.message }}</td></tr>
+					{% else %}
+					<tr><td colspan="2" class="text-secondary">No activity recorded yet.</td></tr>
+					{% endfor %}
+				</tbody>
+				</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var table = document.querySelector('table');
+		var rows = table.querySelectorAll('tr');
+		for (var i = 0; i < rows.length; i++) {
+			var cells = rows[i].querySelectorAll('td');
+			if (cells.length > 1) {
+				var cell = cells[1];
+				var text = cell.textContent;
+				var uuid = text.match(/[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}/i);
+				if (uuid) {
+					var link = '<a href="/admin/players/' + uuid[0] + '">' + uuid[0] + '</a>';
+					cell.innerHTML = text.replace(uuid[0], link);
+				}
+			}
+		}
+	</script>
+{% endblock %}
