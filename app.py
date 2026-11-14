@@ -935,8 +935,14 @@ def Index():
 
 @app.route("/persist/static/manifest.json")
 def Manifest():
-	with open("data/persist/manifest.json", "r") as f:
-		return f.read()
+	manifest_path = os.path.join(PERSIST_DIR, "manifest.json")
+	if not os.path.exists(manifest_path):
+		return jsonify({"version": 1})
+	return send_from_directory(
+		directory=BASE_DIR,
+		path="data/persist/manifest.json",
+		mimetype="application/json",
+	)
 
 #only works in v1.18.0
 @app.route("/persist/static/blueprints", methods=['GET'])
