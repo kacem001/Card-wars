@@ -26,6 +26,15 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
 import discord_webhook
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PERSIST_DIR = os.path.join(BASE_DIR, "data", "persist")
+os.makedirs(PERSIST_DIR, exist_ok=True)
+for version_filename in ("version.txt", "android_version.txt"):
+	version_path = os.path.join(PERSIST_DIR, version_filename)
+	if not os.path.exists(version_path):
+		with open(version_path, "w") as version_file:
+			version_file.write("1.0.0")
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', type=int, default=8080)
 parser.add_argument('--debug', action='store_true')
@@ -60,9 +69,9 @@ maintenance = False
 
 @app.route("/static/version.txt")
 def PersistVersion():
-	with open("data/persist/version.txt", "r") as f:
+	with open(os.path.join(BASE_DIR, "data", "persist", "version.txt"), "r") as f:
 		pc_version = f.read()
-	with open("data/persist/android_version.txt", "r") as f:
+	with open(os.path.join(BASE_DIR, "data", "persist", "android_version.txt"), "r") as f:
 		android_version = f.read()
   
 	data = {
@@ -1752,11 +1761,15 @@ if __name__ == '__main__':
 	Log("server", "Starting server...")
  
 	#create version.txt and android_version.txt if they don't exist
-	if not os.path.exists("data/persist/version.txt"):
-		with open("data/persist/version.txt", "w") as f:
+	persist_dir = os.path.join(BASE_DIR, "data", "persist")
+	os.makedirs(persist_dir, exist_ok=True)
+	version_path = os.path.join(persist_dir, "version.txt")
+	android_version_path = os.path.join(persist_dir, "android_version.txt")
+	if not os.path.exists(version_path):
+		with open(version_path, "w") as f:
 			f.write("1.0.0")
-	if not os.path.exists("data/persist/android_version.txt"):
-		with open("data/persist/android_version.txt", "w") as f:
+	if not os.path.exists(android_version_path):
+		with open(android_version_path, "w") as f:
 			f.write("1.0.0")
 	
 	app.run(debug=args.debug, port=args.port)
